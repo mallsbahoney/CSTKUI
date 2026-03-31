@@ -1,0 +1,893 @@
+Chainstaking UI
+
+<!DOCTYPE html>
+
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ChainStaking</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--g:#00ff87;--gdim:rgba(0,255,135,.10);--gbrd:rgba(0,255,135,.22);--b:#00c2ff;--bdim:rgba(0,194,255,.10);--gold:#ffbe0b;--red:#ff3b5c;--rdim:rgba(255,59,92,.09);--s:.18s ease;}
+[data-theme="dark"]{--bg:#07090d;--bg2:#0b0f16;--bg3:#101620;--sf:#131a26;--sf2:#192233;--bd:rgba(255,255,255,.055);--bd2:rgba(255,255,255,.10);--tx:#edf2f8;--tx2:#6b7e96;--tx3:#303f52;}
+[data-theme="light"]{--bg:#eef1f7;--bg2:#e4e8f2;--bg3:#d9dfeb;--sf:#ffffff;--sf2:#edf0f8;--bd:rgba(0,0,0,.065);--bd2:rgba(0,0,0,.12);--tx:#0b1119;--tx2:#48596e;--tx3:#96afc4;}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent;}
+html[data-theme="dark"],html[data-theme="dark"] body{background-color:#07090d!important;}
+html[data-theme="light"],html[data-theme="light"] body{background-color:#eef1f7!important;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;transition:background var(--s),color var(--s);}
+.page{display:none;background:var(--bg);min-height:100vh;}
+.page.active{display:block;}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:400;background:var(–bg2);border-bottom:1px solid var(–bd);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);}
+.nav-i{max-width:1120px;margin:0 auto;padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.logo{display:flex;align-items:center;gap:8px;font-family:‘Syne’,sans-serif;font-size:16px;font-weight:700;color:var(–tx);cursor:pointer;user-select:none;flex-shrink:0;}
+.lchain{display:flex;align-items:center;gap:3px;}
+.lnode{width:11px;height:11px;border-radius:50%;border:2px solid var(–g);}
+.lnode.d{border-color:var(–tx3);}
+.lbar{width:7px;height:2px;background:var(–bd2);}
+.nav-r{display:flex;align-items:center;gap:5px;}
+.nbtn{padding:5px 11px;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;border:none;color:var(–tx2);background:transparent;font-family:‘DM Sans’,sans-serif;transition:all var(–s);white-space:nowrap;}
+.nbtn:hover{color:var(–tx);background:var(–sf);}
+.nbtn.on{background:var(–sf2);color:var(–tx);border:1px solid var(–bd2);}
+.tbtn{width:32px;height:32px;border-radius:7px;background:var(–sf);border:1px solid var(–bd2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;transition:all var(–s);}
+.wbtn{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:7px;font-size:12px;font-family:‘DM Mono’,monospace;cursor:pointer;background:var(–sf);border:1px solid var(–bd2);color:var(–tx2);transition:all var(–s);white-space:nowrap;flex-shrink:0;}
+.wbtn.on{color:var(–g);border-color:var(–gbrd);background:var(–gdim);}
+.wdot{width:6px;height:6px;border-radius:50%;background:var(–g);box-shadow:0 0 6px var(–g);animation:blink 2s infinite;flex-shrink:0;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* SHARED */
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px;}
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:‘DM Sans’,sans-serif;transition:all var(–s);white-space:nowrap;}
+.btn-g{background:var(–g);color:#050a06;}
+.btn-g:hover:not(:disabled){background:#22ffaa;box-shadow:0 0 20px rgba(0,255,135,.25);}
+.btn-ghost{background:var(–sf2);color:var(–tx2);border:1px solid var(–bd2);}
+.btn-ghost:hover:not(:disabled){color:var(–tx);border-color:var(–tx3);}
+.btn-red{background:var(–rdim);color:var(–red);border:1px solid rgba(255,59,92,.22);}
+.btn-red:hover:not(:disabled){background:rgba(255,59,92,.16);}
+.btn:disabled{opacity:.35;cursor:not-allowed;}
+.btn-sm{padding:7px 13px;font-size:12px;border-radius:7px;}
+
+/* LANDING */
+#landing{background:var(–bg);}
+.hero{padding:64px 16px 48px;max-width:1120px;margin:0 auto;}
+.badge{display:inline-flex;align-items:center;gap:7px;padding:4px 12px;border-radius:100px;background:var(–gdim);border:1px solid var(–gbrd);font-size:11px;font-weight:600;letter-spacing:1.3px;text-transform:uppercase;color:var(–g);margin-bottom:22px;}
+.bdot{width:5px;height:5px;border-radius:50%;background:var(–g);animation:blink 1.5s infinite;}
+h1{font-family:‘Syne’,sans-serif;font-size:clamp(36px,6vw,64px);font-weight:800;line-height:.97;letter-spacing:-2px;margin-bottom:18px;color:var(–tx);}
+h1 em{color:var(–g);font-style:normal;}
+.hero-sub{font-size:16px;color:var(–tx2);line-height:1.65;margin-bottom:28px;max-width:540px;}
+.hero-btns{display:flex;gap:10px;flex-wrap:wrap;}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:0 16px 48px;max-width:1120px;margin:0 auto;}
+@media(max-width:600px){.stats{grid-template-columns:1fr 1fr;}}
+.stat-card{background:var(–sf);border:1px solid var(–bd);border-radius:12px;padding:16px;}
+.stat-val{font-family:‘DM Mono’,monospace;font-size:22px;font-weight:500;margin-bottom:3px;color:var(–tx);}
+.stat-val.g{color:var(–g);}
+.stat-lbl{font-size:11px;color:var(–tx3);text-transform:uppercase;letter-spacing:.8px;}
+.section{padding:48px 16px;max-width:1120px;margin:0 auto;}
+.sec-head{margin-bottom:28px;}
+.sec-head h2{font-family:‘Syne’,sans-serif;font-size:28px;font-weight:700;letter-spacing:-1px;color:var(–tx);margin-bottom:6px;}
+.sec-head p{font-size:14px;color:var(–tx2);}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+@media(max-width:700px){.steps{grid-template-columns:1fr 1fr;}}
+@media(max-width:400px){.steps{grid-template-columns:1fr;}}
+.step{background:var(–sf);border:1px solid var(–bd);border-radius:13px;padding:20px;}
+.step-n{font-family:‘DM Mono’,monospace;font-size:36px;font-weight:400;color:var(–bd2);line-height:1;margin-bottom:12px;}
+.step h3{font-size:14px;font-weight:600;margin-bottom:7px;color:var(–tx);}
+.step p{font-size:13px;color:var(–tx2);line-height:1.6;}
+.landing-footer{text-align:center;padding:36px 16px 64px;}
+
+/* DISCLAIMER */
+#disclaimer{background:var(–bg);}
+.dis-wrap{max-width:600px;margin:0 auto;padding:60px 16px;}
+.dis-wrap h2{font-family:‘Syne’,sans-serif;font-size:24px;font-weight:700;letter-spacing:-.5px;margin-bottom:6px;color:var(–tx);}
+.dis-sub{font-size:14px;color:var(–tx2);margin-bottom:24px;line-height:1.5;}
+.dis-box{background:var(–sf);border:1px solid var(–bd);border-radius:12px;padding:20px;font-size:13px;color:var(–tx2);line-height:1.8;max-height:240px;overflow-y:auto;margin-bottom:22px;}
+.dis-box::-webkit-scrollbar{width:4px;}
+.dis-box::-webkit-scrollbar-thumb{background:var(–bd2);border-radius:2px;}
+.dis-box h4{color:var(–tx);font-size:13px;margin:13px 0 4px;}
+.dis-box h4:first-child{margin-top:0;}
+.checks{display:flex;flex-direction:column;gap:11px;margin-bottom:22px;}
+.ck{display:flex;align-items:flex-start;gap:11px;cursor:pointer;}
+.ck input[type=checkbox]{display:none;}
+.ckbox{width:19px;height:19px;border-radius:5px;border:2px solid var(–bd2);background:var(–sf);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all var(–s);margin-top:1px;}
+.ck input:checked+.ckbox{background:var(–g);border-color:var(–g);}
+.ck input:checked+.ckbox::after{content:‘✓’;font-size:11px;color:#050a06;font-weight:700;}
+.ck-lbl{font-size:13px;color:var(–tx2);line-height:1.5;}
+.ck-lbl strong{color:var(–tx);}
+.enter-btn{width:100%;padding:13px;background:var(–g);color:#050a06;font-size:15px;font-weight:700;font-family:‘DM Sans’,sans-serif;border:none;border-radius:9px;cursor:pointer;transition:all var(–s);opacity:.3;pointer-events:none;}
+.enter-btn.ready{opacity:1;pointer-events:all;}
+.enter-btn.ready:hover{background:#22ffaa;box-shadow:0 0 22px rgba(0,255,135,.25);}
+
+/* PROTOCOL */
+#protocol{background:var(–bg);}
+.proto-wrap{max-width:800px;margin:0 auto;padding:32px 16px;}
+.proto-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;}
+.proto-head h2{font-family:‘Syne’,sans-serif;font-size:22px;font-weight:700;letter-spacing:-.5px;color:var(–tx);}
+
+/* CHAIN DROPDOWN SELECTOR */
+.chain-selector{position:relative;flex-shrink:0;}
+.chain-select-btn{display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(–sf);border:1px solid var(–bd2);border-radius:9px;font-family:‘DM Mono’,monospace;font-size:14px;font-weight:500;color:var(–tx);cursor:pointer;transition:all var(–s);}
+.chain-select-btn:hover{border-color:var(–g);}
+.chain-select-btn .arr{font-size:10px;color:var(–tx3);transition:transform var(–s);}
+.chain-select-btn.open .arr{transform:rotate(180deg);}
+.chain-dropdown{position:absolute;top:calc(100% + 6px);right:0;background:var(–sf);border:1px solid var(–bd2);border-radius:11px;overflow:hidden;min-width:160px;z-index:100;display:none;box-shadow:0 8px 24px rgba(0,0,0,.3);}
+.chain-dropdown.open{display:block;}
+.chain-opt{padding:10px 16px;font-family:‘DM Mono’,monospace;font-size:13px;color:var(–tx2);cursor:pointer;transition:all var(–s);display:flex;align-items:center;justify-content:space-between;}
+.chain-opt:hover{background:var(–sf2);color:var(–tx);}
+.chain-opt.active{color:var(–g);background:var(–gdim);}
+.chain-opt-status{font-size:9px;padding:2px 6px;border-radius:4px;}
+
+/* CHAIN PAGE */
+.chain-page{display:flex;flex-direction:column;gap:14px;}
+
+/* ENTRY CARD */
+.entry-card{background:var(–sf);border:1px solid var(–bd);border-radius:14px;padding:20px;}
+.entry-card-title{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(–tx3);font-family:‘DM Mono’,monospace;margin-bottom:16px;}
+.entry-flow{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
+.entry-box{flex:1;min-width:140px;background:var(–bg3);border:1px solid var(–bd2);border-radius:10px;padding:12px 14px;}
+.entry-box-lbl{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(–tx3);margin-bottom:6px;}
+.entry-box-val{font-family:‘DM Mono’,monospace;font-size:18px;font-weight:500;color:var(–tx);}
+.entry-box-val.g{color:var(–g);}
+.entry-box-sub{font-size:10px;color:var(–tx3);margin-top:3px;}
+.entry-arrow{font-size:18px;color:var(–tx3);flex-shrink:0;}
+
+/* PROFIT BREAKDOWN */
+.profit-breakdown{background:var(–bg3);border:1px solid var(–bd2);border-radius:10px;padding:14px;margin-bottom:20px;}
+.pb-title{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(–tx3);font-family:‘DM Mono’,monospace;margin-bottom:10px;}
+.pb-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(–bd);font-size:13px;}
+.pb-row:last-child{border-bottom:none;}
+.pb-key{color:var(–tx2);}
+.pb-val{font-family:‘DM Mono’,monospace;font-weight:500;}
+.pb-val.g{color:var(–g);}
+.pb-val.gold{color:var(–gold);}
+.pb-val.b{color:var(–b);}
+
+/* YIELD & BOUNTY CARDS */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:560px){.two-col{grid-template-columns:1fr;}}
+.info-card{background:var(–sf);border:1px solid var(–bd);border-radius:14px;padding:18px;}
+.info-card-title{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(–tx3);font-family:‘DM Mono’,monospace;margin-bottom:12px;}
+.info-card-val{font-family:‘DM Mono’,monospace;font-size:28px;font-weight:500;margin-bottom:4px;}
+.info-card-val.g{color:var(–g);}
+.info-card-val.b{color:var(–b);}
+.info-card-sub{font-size:12px;color:var(–tx3);line-height:1.5;}
+
+/* DONATION BAR */
+.don-bar-wrap{margin-top:14px;}
+.don-bar-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.don-bar-lbl{font-size:11px;color:var(–tx2);font-weight:500;}
+.don-bar-vals{font-size:11px;font-family:‘DM Mono’,monospace;color:var(–tx2);}
+.don-bar-vals span.pct{color:var(–b);}
+.don-bar-track{height:6px;background:var(–bd);border-radius:100px;overflow:hidden;}
+.don-bar-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(–b),var(–g));transition:width .5s ease;}
+
+/* TIMER */
+.timer-card{background:var(–sf);border:1px solid var(–bd);border-radius:14px;padding:18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.timer-left{display:flex;flex-direction:column;gap:4px;}
+.timer-lbl{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(–tx3);font-family:‘DM Mono’,monospace;}
+.timer-val{font-family:‘DM Mono’,monospace;font-size:22px;font-weight:500;color:var(–tx);}
+.timer-val.expired{color:var(–g);}
+.timer-note{font-size:12px;color:var(–tx3);}
+
+/* CHAIN ACTIONS */
+.chain-actions{display:flex;gap:10px;flex-wrap:wrap;}
+
+/* STAKERS DROPDOWN */
+.stakers-toggle{display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(–sf);border:1px solid var(–bd);border-radius:14px;cursor:pointer;font-size:13px;color:var(–tx2);transition:all var(–s);user-select:none;}
+.stakers-toggle:hover{color:var(–tx);border-color:var(–bd2);}
+.stakers-toggle .sarr{font-size:10px;margin-left:auto;transition:transform var(–s);}
+.stakers-toggle.open .sarr{transform:rotate(180deg);}
+.stakers-list{display:none;background:var(–sf);border:1px solid var(–bd);border-radius:14px;overflow:hidden;margin-top:4px;}
+.stakers-list.open{display:block;}
+.staker-row{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(–bd);font-size:12px;}
+.staker-row:last-child{border-bottom:none;}
+.staker-num{width:20px;height:20px;border-radius:50%;background:var(–bg3);border:1px solid var(–bd2);display:flex;align-items:center;justify-content:center;font-size:9px;font-family:‘DM Mono’,monospace;color:var(–tx3);flex-shrink:0;}
+.staker-addr{flex:1;font-family:‘DM Mono’,monospace;font-size:11px;color:var(–tx2);}
+.staker-amt{font-family:‘DM Mono’,monospace;font-size:12px;color:var(–tx);}
+.me-badge{font-size:9px;padding:2px 6px;border-radius:4px;background:var(–bdim);color:var(–b);font-weight:700;}
+.last-badge{font-size:9px;padding:2px 6px;border-radius:4px;background:var(–gdim);color:var(–g);font-weight:700;}
+
+/* PROFILE */
+#profile-page{background:var(–bg);}
+.profile-wrap{max-width:800px;margin:0 auto;padding:32px 16px;}
+.profile-head{margin-bottom:24px;}
+.profile-head h2{font-family:‘Syne’,sans-serif;font-size:22px;font-weight:700;letter-spacing:-.5px;color:var(–tx);margin-bottom:4px;}
+.profile-head p{font-size:13px;color:var(–tx2);}
+.profile-sum{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px;}
+@media(max-width:480px){.profile-sum{grid-template-columns:1fr;}}
+.ps-card{background:var(–sf);border:1px solid var(–bd);border-radius:11px;padding:14px;}
+.ps-val{font-family:‘DM Mono’,monospace;font-size:20px;font-weight:500;margin-bottom:3px;}
+.ps-val.g{color:var(–g);}
+.ps-val.b{color:var(–b);}
+.ps-val.gold{color:var(–gold);}
+.ps-lbl{font-size:10px;color:var(–tx3);text-transform:uppercase;letter-spacing:.8px;}
+.pos-list{display:flex;flex-direction:column;gap:10px;}
+.pos-card{background:var(–sf);border:1px solid var(–bd);border-radius:13px;padding:18px;}
+.pos-card.is-last{border-color:var(–gbrd);}
+.pos-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;}
+.pos-name{font-family:‘Syne’,sans-serif;font-size:16px;font-weight:700;color:var(–tx);}
+.pos-sub{font-size:11px;color:var(–tx3);font-family:‘DM Mono’,monospace;margin-top:2px;}
+.pos-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;}
+.pg-item{display:flex;flex-direction:column;gap:3px;}
+.pg-val{font-family:‘DM Mono’,monospace;font-size:14px;font-weight:500;}
+.pg-val.g{color:var(–g);}
+.pg-val.gold{color:var(–gold);}
+.pg-val.b{color:var(–b);}
+.pg-lbl{font-size:10px;color:var(–tx3);text-transform:uppercase;letter-spacing:.7px;}
+.pos-profits{background:var(–bg2);border:1px solid var(–bd);border-radius:10px;padding:14px;margin-bottom:14px;}
+.pp-title{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(–tx3);font-family:‘DM Mono’,monospace;margin-bottom:10px;}
+.pp-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:6px 0;border-bottom:1px solid var(–bd);}
+.pp-row:last-child{border-bottom:none;}
+.pp-k{color:var(–tx2);}
+.pp-v{font-family:‘DM Mono’,monospace;font-weight:500;}
+.pp-v.g{color:var(–g);}
+.pp-v.b{color:var(–b);}
+.pp-v.gold{color:var(–gold);}
+.pos-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.empty-state{text-align:center;padding:56px 16px;color:var(–tx3);}
+.empty-state h3{font-size:16px;color:var(–tx2);margin-bottom:6px;}
+.empty-state p{font-size:13px;line-height:1.6;}
+.withdraw-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:100px;background:var(–gdim);border:1px solid var(–gbrd);font-size:10px;font-weight:600;color:var(–g);}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(6px);z-index:999;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .22s;}
+.overlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(–sf);border:1px solid var(–bd2);border-radius:16px;width:100%;max-width:420px;max-height:88vh;overflow-y:auto;transform:translateY(14px) scale(.98);transition:transform .22s;}
+.overlay.open .modal{transform:translateY(0) scale(1);}
+.modal-head{padding:18px 18px 14px;border-bottom:1px solid var(–bd);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(–sf);border-radius:16px 16px 0 0;}
+.modal-head h3{font-size:15px;font-weight:600;color:var(–tx);}
+.modal-x{width:28px;height:28px;border-radius:6px;background:var(–sf2);border:1px solid var(–bd);color:var(–tx2);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all var(–s);}
+.modal-x:hover{color:var(–tx);}
+.modal-body{padding:16px 18px;}
+.modal-foot{padding:12px 18px;border-top:1px solid var(–bd);display:flex;gap:8px;}
+.modal-foot .btn{flex:1;padding:10px;}
+.m-note{background:var(–gdim);border:1px solid var(–gbrd);border-radius:9px;padding:11px;margin-bottom:13px;font-size:13px;color:var(–tx2);line-height:1.5;}
+.m-note strong{color:var(–g);}
+.m-note.red{background:var(–rdim);border-color:rgba(255,59,92,.22);}
+.m-note.red strong{color:var(–red);}
+.m-rows{display:flex;flex-direction:column;margin-bottom:13px;}
+.m-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(–bd);font-size:13px;}
+.m-row:last-child{border-bottom:none;}
+.m-k{color:var(–tx2);}
+.m-v{font-family:‘DM Mono’,monospace;font-weight:500;}
+.m-v.g{color:var(–g);}
+.m-v.b{color:var(–b);}
+.m-v.gold{color:var(–gold);}
+.m-v.r{color:var(–red);}
+.m-field{margin-bottom:13px;}
+.m-field label{font-size:12px;color:var(–tx2);font-weight:500;margin-bottom:7px;display:block;}
+.m-input-wrap{position:relative;}
+.m-input{width:100%;padding:10px 13px;padding-right:46px;background:var(–bg2);border:1px solid var(–bd2);border-radius:8px;color:var(–tx);font-family:‘DM Mono’,monospace;font-size:15px;outline:none;transition:border-color var(–s);}
+.m-input:focus{border-color:var(–g);}
+.m-suffix{position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:12px;color:var(–tx3);font-family:‘DM Mono’,monospace;}
+
+/* TOAST */
+.toasts{position:fixed;bottom:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:7px;}
+.toast{display:flex;align-items:center;gap:9px;padding:10px 15px;border-radius:9px;background:var(–sf2);border:1px solid var(–bd2);font-size:13px;color:var(–tx);box-shadow:0 6px 20px rgba(0,0,0,.3);min-width:230px;animation:tin .25s ease;}
+.toast.ok{border-color:var(–gbrd);}
+.toast.err{border-color:rgba(255,59,92,.3);}
+@keyframes tin{from{transform:translateX(16px);opacity:0}to{transform:translateX(0);opacity:1}}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-thumb{background:var(–bd2);border-radius:2px;}
+</style>
+
+</head>
+<body>
+
+<nav id="mainNav">
+  <div class="nav-i">
+    <div class="logo" onclick="goHome()">
+      <div class="lchain"><div class="lnode"></div><div class="lbar"></div><div class="lnode d"></div></div>
+      ChainStaking
+    </div>
+    <div class="nav-r">
+      <button class="nbtn" id="nPro" onclick="showPage('protocol')" style="display:none">Protocol</button>
+      <button class="nbtn" id="nProf" onclick="showPage('profile-page')" style="display:none">Profile</button>
+      <button class="tbtn" id="themeBtn" onclick="toggleTheme()">🌙</button>
+      <button class="wbtn" id="walletBtn" onclick="toggleWallet()">Connect Wallet</button>
+    </div>
+  </div>
+</nav>
+
+<!-- LANDING -->
+
+<div class="page active" id="landing">
+  <div class="hero">
+    <div class="badge"><div class="bdot"></div>Built on Solana · Lossless Yield Auction</div>
+    <h1>The only competition<br>is <em>how much you win.</em></h1>
+    <p class="hero-sub">ChainStaking is a chain auction for Solana staking yield. Every participant is guaranteed their spread profit. The only question is who captures the yield pool.</p>
+    <div class="hero-btns">
+      <button class="btn btn-g" onclick="goDisclaimer()">Enter Protocol →</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">How it works</button>
+    </div>
+  </div>
+  <div class="stats wrap">
+    <div class="stat-card"><div class="stat-val g" id="ls-staked">847.3</div><div class="stat-lbl">SOL Staked</div></div>
+    <div class="stat-card"><div class="stat-val" id="ls-yield">12.8400</div><div class="stat-lbl">SOL in Yield Pools</div></div>
+    <div class="stat-card"><div class="stat-val">1,247</div><div class="stat-lbl">Active Stakers</div></div>
+    <div class="stat-card"><div class="stat-val">10</div><div class="stat-lbl">Permanent Chains</div></div>
+  </div>
+  <div class="section" id="how">
+    <div class="sec-head"><h2>How it works</h2><p>A chain auction for staking yield. Everyone profits from their spread. The yield pool is up for grabs.</p></div>
+    <div class="steps">
+      <div class="step"><div class="step-n">01</div><h3>Enter a chain</h3><p>Pick a spread and stake SOL + 1% fee. Each new entrant must outbid the last. Your spread profit is guaranteed the moment someone enters after you.</p></div>
+      <div class="step"><div class="step-n">02</div><h3>Yield accumulates</h3><p>All staked SOL earns real Solana staking yield into one shared pool. The longer the auction runs, the bigger the prize.</p></div>
+      <div class="step"><div class="step-n">03</div><h3>Compete for the pool</h3><p>Hold last claim and break manually to take the entire yield pool. Or donate to the bounty pot — if it hits the target, the chain auto-breaks and the community splits the yield pool.</p></div>
+      <div class="step"><div class="step-n">04</div><h3>Everyone wins something</h3><p>Manual break: last holder takes yield pool, bounty pot splits to earlier stakers. Community break: last holder gets donation pot, community splits yield pool. Spread profit guaranteed either way.</p></div>
+    </div>
+  </div>
+  <div class="landing-footer">
+    <button class="btn btn-g" onclick="goDisclaimer()">Enter Protocol →</button>
+    <p style="margin-top:12px;font-size:12px;color:var(--tx3)">Disclaimer required · Frozen contract · No upgrades ever · 1% fee on stakes only</p>
+  </div>
+</div>
+
+<!-- DISCLAIMER -->
+
+<div class="page" id="disclaimer">
+  <div class="dis-wrap">
+    <h2>Before you continue</h2>
+    <p class="dis-sub">Read and accept all terms before entering the ChainStaking protocol.</p>
+    <div class="dis-box">
+      <h4>1. Experimental Protocol</h4>
+      ChainStaking is a decentralized, experimental staking coordination protocol on Solana. The smart contract is immutable — once deployed it cannot be modified, upgraded, or shut down by any party.
+      <h4>2. Protocol Fee</h4>
+      A 1% fee is added to each stake at the time of entry. There are no fees on withdrawals. This fee funds protocol operations and is non-refundable.
+      <h4>3. No Financial Advice</h4>
+      Nothing here constitutes financial, investment, legal, or tax advice. Participation is entirely at your own discretion and risk.
+      <h4>4. Smart Contract Risk</h4>
+      Smart contracts may contain bugs. Funds are subject to smart contract risk. Developers bear no liability for any loss of funds.
+      <h4>5. No Guarantees</h4>
+      While the protocol is designed so stakers receive their spread profit on chain break, this depends on correct functioning of the contract and Solana network.
+      <h4>6. Regulatory Compliance</h4>
+      You confirm participation does not violate any laws in your jurisdiction. You are solely responsible for tax obligations.
+      <h4>7. Not Securities</h4>
+      SOL staked through this protocol does not represent shares, equity, debt, or securities of any kind.
+      <h4>8. No Recourse</h4>
+      By entering you waive all claims against developers and contributors. All transactions are irreversible once submitted to the blockchain.
+      <h4>9. Experimental Software</h4>
+      Use only funds you can afford to lose entirely.
+    </div>
+    <div class="checks">
+      <label class="ck"><input type="checkbox" id="c1" onchange="checkAll()"><div class="ckbox"></div><div class="ck-lbl">I understand this is <strong>experimental software</strong> with smart contract risk and I use only funds I can afford to lose.</div></label>
+      <label class="ck"><input type="checkbox" id="c3" onchange="checkAll()"><div class="ckbox"></div><div class="ck-lbl">The <strong>smart contract is immutable</strong>, no party can reverse transactions, and I have no recourse for losses.</div></label>
+      <label class="ck"><input type="checkbox" id="c4" onchange="checkAll()"><div class="ckbox"></div><div class="ck-lbl">I have read all terms and enter the protocol <strong>entirely at my own risk</strong>.</div></label>
+    </div>
+    <button class="enter-btn" id="enterBtn" onclick="enterProtocol()">I Accept — Enter Protocol</button>
+    <p style="margin-top:12px;font-size:12px;color:var(--tx3);text-align:center">← <span style="cursor:pointer;text-decoration:underline" onclick="showPage('landing')">Go back</span></p>
+  </div>
+</div>
+
+<!-- PROTOCOL -->
+
+<div class="page" id="protocol">
+  <div class="proto-wrap">
+    <div class="proto-head">
+      <div>
+        <h2>Chain Auction</h2>
+        <div style="font-size:11px;color:var(--tx3);font-family:'DM Mono',monospace;margin-top:2px;">Frozen contract · 1% fee on stakes · No fees on withdrawals</div>
+      </div>
+      <div class="chain-selector">
+        <div class="chain-select-btn" id="chainSelectBtn" onclick="toggleChainDropdown()">
+          <span id="chainSelectLabel">5% Chain</span>
+          <span class="arr">▼</span>
+        </div>
+        <div class="chain-dropdown" id="chainDropdown"></div>
+      </div>
+    </div>
+    <div class="chain-page" id="chainPage"></div>
+  </div>
+</div>
+
+<!-- PROFILE -->
+
+<div class="page" id="profile-page">
+  <div class="profile-wrap">
+    <div class="profile-head"><h2>Profile</h2><p>Your positions, estimated profits, and available rewards</p></div>
+    <div class="profile-sum">
+      <div class="ps-card"><div class="ps-val b" id="ps-c">0</div><div class="ps-lbl">Open Positions</div></div>
+      <div class="ps-card"><div class="ps-val g" id="ps-p">0.0000</div><div class="ps-lbl">Est. Profit (SOL)</div></div>
+      <div class="ps-card"><div class="ps-val gold" id="ps-w">0.0000</div><div class="ps-lbl">Rewards to Withdraw</div></div>
+    </div>
+    <div class="pos-list" id="posList"></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+
+<div class="overlay" id="overlay" onclick="overlayClick(event)">
+  <div class="modal">
+    <div class="modal-head"><h3 id="mTitle">Action</h3><div class="modal-x" onclick="closeModal()">✕</div></div>
+    <div class="modal-body" id="mBody"></div>
+    <div class="modal-foot" id="mFoot"></div>
+  </div>
+</div>
+<div class="toasts" id="toasts"></div>
+
+<script>
+const FEE = 0.01;
+const ME = '4xF8...kM2n';
+const COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
+let theme = 'dark';
+let walletConnected = false;
+let currentChainId = 0;
+
+let myPositions = [
+  { chainId:0, staked:0.01157, profit:null, isLast:true,  posId:'p1', enteredAt: Date.now() - 6*60*1000 },
+  { chainId:1, staked:0.01210, profit:0.00121, isLast:false, posId:'p2', enteredAt: Date.now() - 2*60*60*1000 },
+  { chainId:1, staked:0.01331, profit:0.00133, isLast:false, posId:'p3', enteredAt: Date.now() - 1*60*60*1000 },
+];
+
+const CHAINS = [
+  { id:0,  spread:5,     label:'5%',     status:'active',
+    stakers:[
+      {addr:'9pL2...vN8q',staked:0.01000,profit:0.00050,last:false,me:false},
+      {addr:'7xK9...mR3p',staked:0.01050,profit:0.00053,last:false,me:false},
+      {addr:'8nR5...jQ2w',staked:0.01102,profit:0.00055,last:false,me:false},
+      {addr:ME,           staked:0.01157,profit:null,   last:true, me:true, enteredAt: Date.now()-6*60*1000},
+    ], yieldPool:0.0031, donPot:0.0048, runtime:'14d 6h', totalStaked:0.0441 },
+
+  { id:1,  spread:10,    label:'10%',    status:'hot',
+    stakers:[
+      {addr:'2xP5...nK8r',staked:0.01000,profit:0.00100,last:false,me:false},
+      {addr:'6mQ3...bL9s',staked:0.01100,profit:0.00110,last:false,me:false},
+      {addr:ME,           staked:0.01210,profit:0.00121,last:false,me:true},
+      {addr:ME,           staked:0.01331,profit:0.00133,last:false,me:true},
+      {addr:'5pK2...wN6u',staked:0.01464,profit:null,   last:true, me:false, enteredAt: Date.now()-10*60*1000},
+    ], yieldPool:0.0187, donPot:0.0092, runtime:'8d 14h', totalStaked:0.0621 },
+
+  { id:2,  spread:25,    label:'25%',    status:'active',
+    stakers:[
+      {addr:'8vN4...cP7q',staked:0.01000, profit:0.00250,last:false,me:false},
+      {addr:'3kM9...dR2w',staked:0.01250, profit:0.00313,last:false,me:false},
+      {addr:'7pJ6...eS5x',staked:0.015625,profit:null,   last:true, me:false, enteredAt: Date.now()-20*60*1000},
+    ], yieldPool:0.0092, donPot:0.0031, runtime:'3d 2h', totalStaked:0.038125 },
+
+  { id:3,  spread:50,    label:'50%',    status:'active',
+    stakers:[
+      {addr:'1nK8...fT3y',staked:0.01000,profit:0.00500,last:false,me:false},
+      {addr:'6mP3...gU8z',staked:0.01500,profit:0.00750,last:false,me:false},
+      {addr:'4vL7...hV4a',staked:0.02250,profit:null,   last:true, me:false, enteredAt: Date.now()-30*60*1000},
+    ], yieldPool:0.0143, donPot:0.0021, runtime:'1d 18h', totalStaked:0.0475 },
+
+  { id:4,  spread:100,   label:'100%',   status:'active',
+    stakers:[
+      {addr:'9kR2...iW5b',staked:0.010,profit:0.010,last:false,me:false},
+      {addr:'2mN6...jX9c',staked:0.020,profit:0.020,last:false,me:false},
+      {addr:'7pQ1...kY3d',staked:0.040,profit:null, last:true, me:false, enteredAt: Date.now()-60*60*1000},
+    ], yieldPool:0.0284, donPot:0.0087, runtime:'5d 11h', totalStaked:0.070 },
+
+  { id:5,  spread:250,   label:'250%',   status:'active',
+    stakers:[
+      {addr:'5vM4...lZ7e',staked:0.010,profit:0.025,last:false,me:false},
+      {addr:'3nP8...mA2f',staked:0.035,profit:null, last:true, me:false, enteredAt: Date.now()-2*60*60*1000},
+    ], yieldPool:0.0031, donPot:0.0, runtime:'12h 4m', totalStaked:0.045 },
+
+  { id:6,  spread:500,   label:'500%',   status:'empty',
+    stakers:[
+      {addr:'8kL5...nB6g',staked:0.010,profit:null,last:true,me:false, enteredAt: Date.now()-3*60*60*1000},
+    ], yieldPool:0.00041, donPot:0.0, runtime:'2h 17m', totalStaked:0.010 },
+
+  { id:7,  spread:1000,  label:'1000%',  status:'empty',  stakers:[], yieldPool:0, donPot:0, runtime:'—', totalStaked:0 },
+  { id:8,  spread:5000,  label:'5000%',  status:'empty',  stakers:[], yieldPool:0, donPot:0, runtime:'—', totalStaked:0 },
+
+  { id:9,  spread:10000, label:'10000%', status:'whale',
+    stakers:[
+      {addr:'1vK9...oC3h',staked:0.010,  profit:1.000,  last:false,me:false},
+      {addr:'6mR2...pD8i',staked:1.010,  profit:101.00, last:false,me:false},
+      {addr:'4nQ7...qE5j',staked:102.01, profit:null,   last:true, me:false, enteredAt: Date.now()-24*60*60*1000},
+    ], yieldPool:4.821, donPot:12.4, runtime:'22d 3h', totalStaked:103.031 },
+];
+
+/* ── HELPERS ── */
+function fmt(n,d=4){ return Number(n).toFixed(d); }
+function nextStake(c){ return c.stakers.length ? c.stakers[c.stakers.length-1].staked*(1+c.spread/100) : 0.01; }
+function entryRequired(c){ return nextStake(c)*(1+FEE); }
+function nextProfit(c){ return nextStake(c)*(c.spread/100); }
+function donPct(c){ return c.stakers.length ? Math.min((c.donPot/c.stakers[c.stakers.length-1].staked)*100,100):0; }
+function isMeLast(c){ return c.stakers.length>0 && c.stakers[c.stakers.length-1].me; }
+function hasMe(c){ return c.stakers.some(s=>s.me); }
+function myYieldShare(c){
+  if(!c.stakers.length || !c.totalStaked) return 0;
+  const myTotal = c.stakers.filter(s=>s.me).reduce((a,s)=>a+s.staked,0);
+  return c.yieldPool * (myTotal/c.totalStaked);
+}
+function timerExpired(c){
+  if(!c.stakers.length) return true;
+  const last = c.stakers[c.stakers.length-1];
+  if(!last.enteredAt) return true;
+  return Date.now() - last.enteredAt >= COOLDOWN_MS;
+}
+function timerRemaining(c){
+  if(!c.stakers.length) return 0;
+  const last = c.stakers[c.stakers.length-1];
+  if(!last.enteredAt) return 0;
+  return Math.max(0, COOLDOWN_MS - (Date.now()-last.enteredAt));
+}
+function fmtTimer(ms){
+  if(ms<=0) return 'Expired';
+  const m=Math.floor(ms/60000), s=Math.floor((ms%60000)/1000);
+  return `${m}:${String(s).padStart(2,'0')}`;
+}
+function statusCls(s){ return {active:'cp-active',hot:'cp-hot',empty:'cp-empty',whale:'cp-whale'}[s]||'cp-empty'; }
+
+/* ── THEME ── */
+function toggleTheme(){
+  theme=theme==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',theme);
+  document.getElementById('themeBtn').textContent=theme==='dark'?'🌙':'☀️';
+}
+
+/* ── PAGES ── */
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  const inApp=['protocol','profile-page'].includes(id);
+  document.getElementById('nPro').style.display=inApp?'':'none';
+  document.getElementById('nProf').style.display=inApp?'':'none';
+  document.getElementById('nPro').className='nbtn'+(id==='protocol'?' on':'');
+  document.getElementById('nProf').className='nbtn'+(id==='profile-page'?' on':'');
+  if(id==='protocol'){ buildChainDropdown(); renderChainPage(); startTimerTick(); }
+  if(id==='profile-page') renderProfile();
+}
+function goHome(){ showPage('landing'); }
+function goDisclaimer(){ showPage('disclaimer'); }
+function enterProtocol(){ showPage('protocol'); toast('Welcome to ChainStaking','ok'); }
+
+function checkAll(){
+  const all=['c1','c3','c4'].every(id=>document.getElementById(id).checked);
+  document.getElementById('enterBtn').classList.toggle('ready',all);
+}
+
+/* ── WALLET ── */
+function toggleWallet(){
+  walletConnected=!walletConnected;
+  const b=document.getElementById('walletBtn');
+  if(walletConnected){ b.className='wbtn on'; b.innerHTML=`<div class="wdot"></div>${ME}`; toast('Wallet connected','ok'); }
+  else{ b.className='wbtn'; b.innerHTML='Connect Wallet'; }
+  renderChainPage(); renderProfile();
+}
+
+/* ── CHAIN DROPDOWN ── */
+function buildChainDropdown(){
+  const dd=document.getElementById('chainDropdown');
+  dd.innerHTML=CHAINS.map(c=>`
+    <div class="chain-opt${c.id===currentChainId?' active':''}" onclick="selectChain(${c.id})">
+      <span>${c.label}</span>
+      <span class="chain-opt-status" style="background:${{active:'rgba(0,255,135,.1)',hot:'rgba(255,190,11,.1)',empty:'rgba(255,255,255,.05)',whale:'rgba(185,124,255,.1)'}[c.status]||'rgba(255,255,255,.05)'};color:${{active:'#00ff87',hot:'#ffbe0b',empty:'#303f52',whale:'#b97cff'}[c.status]||'#303f52'}">${{active:'Active',hot:'Hot',empty:'Waiting',whale:'Whale'}[c.status]||'Waiting'}</span>
+    </div>`).join('');
+}
+
+function toggleChainDropdown(){
+  const btn=document.getElementById('chainSelectBtn');
+  const dd=document.getElementById('chainDropdown');
+  btn.classList.toggle('open');
+  dd.classList.toggle('open');
+}
+
+function selectChain(id){
+  currentChainId=id;
+  document.getElementById('chainSelectLabel').textContent=CHAINS[id].label+' Chain';
+  document.getElementById('chainSelectBtn').classList.remove('open');
+  document.getElementById('chainDropdown').classList.remove('open');
+  buildChainDropdown();
+  renderChainPage();
+}
+
+/* ── CHAIN PAGE ── */
+function renderChainPage(){
+  const chain=CHAINS[currentChainId];
+  const page=document.getElementById('chainPage');
+  const ns=nextStake(chain);
+  const er=entryRequired(chain);
+  const np=nextProfit(chain);
+  const lastS=chain.stakers.length?chain.stakers[chain.stakers.length-1]:null;
+  const pct=donPct(chain);
+  const meLast=isMeLast(chain);
+  const expired=timerExpired(chain);
+  const remaining=timerRemaining(chain);
+  const myShare=myYieldShare(chain);
+
+  page.innerHTML=`
+    <!-- ENTRY CARD -->
+    <div class="entry-card">
+      <div class="entry-card-title">Entry Price</div>
+      <div class="entry-flow">
+        <div class="entry-box">
+          <div class="entry-box-lbl">Cost to Enter</div>
+          <div class="entry-box-val">${fmt(er)} SOL</div>
+          <div class="entry-box-sub">incl. 1% fee (${fmt(ns*FEE,4)} SOL)</div>
+        </div>
+        <div class="entry-arrow">→</div>
+        <div class="entry-box">
+          <div class="entry-box-lbl">Est. Profit Floor</div>
+          <div class="entry-box-val g">+${fmt(np)} SOL</div>
+          <div class="entry-box-sub">${chain.spread}% spread on ${fmt(ns)} SOL</div>
+        </div>
+      </div>
+      <div class="profit-breakdown">
+        <div class="pb-title">Estimated Profit Scenarios</div>
+        <div class="pb-row"><span class="pb-key">Floor (spread profit)</span><span class="pb-val g">+${fmt(np)} SOL</span></div>
+        <div class="pb-row"><span class="pb-key">Community Break (spread + yield share)</span><span class="pb-val b">+${fmt(np)} SOL + est. ${fmt(myShare>0?myShare:chain.yieldPool/Math.max(chain.stakers.length+1,1))} SOL yield share</span></div>
+        <div class="pb-row"><span class="pb-key">Manual Break (entire yield pool)</span><span class="pb-val gold">${fmt(chain.yieldPool)} SOL yield pool</span></div>
+      </div>
+      <div class="chain-actions">
+        <button class="btn btn-g" onclick="openEnter(${chain.id})" ${!walletConnected?'disabled':''}>Enter — ${fmt(er)} SOL</button>
+        ${hasMe(chain)?`<button class="btn btn-ghost btn-sm" onclick="openDonate(${chain.id})" ${!walletConnected?'disabled':''}>Donate to Bounty</button>`:''}
+        ${meLast&&expired?`<button class="btn btn-red btn-sm" onclick="openBreak(${chain.id})">Break the Chain</button>`:''}
+      </div>
+    </div>
+
+    <!-- YIELD + BOUNTY -->
+    <div class="two-col">
+      <div class="info-card">
+        <div class="info-card-title">Yield Pool 🏆</div>
+        <div class="info-card-val g">${fmt(chain.yieldPool)} SOL</div>
+        <div class="info-card-sub">Accumulated staking yield from all entries. Manual break: last holder takes all. Community break: splits proportionally to all stakers.</div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-title">Bounty Pot</div>
+        <div class="info-card-val b">${fmt(chain.donPot)} SOL</div>
+        <div class="don-bar-wrap">
+          <div class="don-bar-top">
+            <span class="don-bar-lbl">Target: ${fmt(lastS?lastS.staked:0.01)} SOL</span>
+            <span class="don-bar-vals"><span class="pct">${pct.toFixed(0)}%</span></span>
+          </div>
+          <div class="don-bar-track"><div class="don-bar-fill" style="width:${pct}%"></div></div>
+        </div>
+        <div class="info-card-sub" style="margin-top:8px">When pot hits the last holder's stake amount, chain auto-breaks. Last holder gets donation pot. Community splits yield pool.</div>
+      </div>
+    </div>
+
+    <!-- TIMER -->
+    ${chain.stakers.length?`
+    <div class="timer-card">
+      <div class="timer-left">
+        <div class="timer-lbl">5-Minute Cooldown Timer</div>
+        <div class="timer-val${expired?' expired':''}" id="timerVal">${expired?'Expired — Break available':fmtTimer(remaining)}</div>
+        <div class="timer-note">${expired?'Last holder can now manually break the chain':'Timer must expire before manual break is allowed'}</div>
+      </div>
+      ${meLast&&!expired?`<div style="font-size:12px;color:var(--tx3);text-align:right">Waiting for<br>timer to expire</div>`:''}
+    </div>`:''}
+
+    <!-- CHAIN INFO -->
+    <div class="info-card">
+      <div class="info-card-title">Chain Info</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="pg-item"><div class="pg-val">${chain.stakers.length}</div><div class="pg-lbl">Total Entrants</div></div>
+        <div class="pg-item"><div class="pg-val">${fmt(chain.totalStaked)} SOL</div><div class="pg-lbl">Total Staked</div></div>
+        <div class="pg-item"><div class="pg-val">${chain.runtime}</div><div class="pg-lbl">Running</div></div>
+        <div class="pg-item"><div class="pg-val">${chain.label}</div><div class="pg-lbl">Spread</div></div>
+      </div>
+    </div>
+
+    <!-- STAKERS DROPDOWN -->
+    ${chain.stakers.length?`
+    <div class="stakers-toggle" onclick="toggleStakers()" id="stakersToggle">
+      <span>View all entrants (${chain.stakers.length})</span>
+      <span class="sarr">▼</span>
+    </div>
+    <div class="stakers-list" id="stakersList">
+      ${chain.stakers.map((s,i)=>`
+      <div class="staker-row">
+        <div class="staker-num">${i+1}</div>
+        <div class="staker-addr">${s.addr}</div>
+        ${s.me?`<span class="me-badge">YOU</span>`:''}
+        ${s.last?`<span class="last-badge">HOLDING</span>`:''}
+        <div class="staker-amt">${fmt(s.staked)} SOL</div>
+      </div>`).join('')}
+    </div>`:'<div style="text-align:center;padding:20px;color:var(--tx3);font-size:13px;background:var(--sf);border:1px solid var(--bd);border-radius:14px">No entrants yet — be the first for '+fmt(entryRequired(chain))+' SOL</div>'}
+  `;
+}
+
+function toggleStakers(){
+  const t=document.getElementById('stakersToggle');
+  const l=document.getElementById('stakersList');
+  if(t&&l){ t.classList.toggle('open'); l.classList.toggle('open'); }
+}
+
+/* ── TIMER TICK ── */
+let timerInterval=null;
+function startTimerTick(){
+  if(timerInterval) clearInterval(timerInterval);
+  timerInterval=setInterval(()=>{
+    const el=document.getElementById('timerVal');
+    if(!el) return;
+    const chain=CHAINS[currentChainId];
+    const expired=timerExpired(chain);
+    const remaining=timerRemaining(chain);
+    el.textContent=expired?'Expired — Break available':fmtTimer(remaining);
+    el.className='timer-val'+(expired?' expired':'');
+    if(expired) clearInterval(timerInterval);
+  },1000);
+}
+
+/* ── PROFILE ── */
+function renderProfile(){
+  const list=document.getElementById('posList');
+  list.innerHTML='';
+  const totalProfit=myPositions.reduce((a,p)=>a+(p.profit||0),0);
+  document.getElementById('ps-c').textContent=myPositions.length;
+  document.getElementById('ps-p').textContent=fmt(totalProfit);
+  // rewards to withdraw = profits from positions where chain has broken (simplified: non-last positions)
+  const withdrawable=myPositions.filter(p=>!p.isLast).reduce((a,p)=>a+(p.profit||0),0);
+  document.getElementById('ps-w').textContent=fmt(withdrawable);
+  if(!myPositions.length){
+    list.innerHTML=`<div class="empty-state"><h3>No positions yet</h3><p>Enter a chain in the Protocol page to get started.</p></div>`;
+    return;
+  }
+  myPositions.forEach(pos=>{
+    const chain=CHAINS[pos.chainId];
+    if(!chain) return;
+    const card=document.createElement('div');
+    card.className=`pos-card${pos.isLast?' is-last':''}`;
+    const myStakeShare=chain.totalStaked>0?pos.staked/chain.totalStaked:0;
+    const estYieldShare=chain.yieldPool*myStakeShare;
+    card.innerHTML=`
+      <div class="pos-top">
+        <div>
+          <div class="pos-name">${chain.label} Spread Chain</div>
+          <div class="pos-sub">${chain.runtime} running · ${chain.stakers.length} entrants · pos ${pos.posId}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          ${pos.isLast?`<span class="last-badge">HOLDING LAST CLAIM</span>`:''}
+          ${!pos.isLast&&pos.profit?`<span class="withdraw-badge">⚡ Profit Available</span>`:''}
+        </div>
+      </div>
+      <div class="pos-grid">
+        <div class="pg-item"><div class="pg-val">${fmt(pos.staked)} SOL</div><div class="pg-lbl">You Staked</div></div>
+        <div class="pg-item"><div class="pg-val g">+${fmt(pos.profit||0)} SOL</div><div class="pg-lbl">Est. Spread Profit</div></div>
+        <div class="pg-item"><div class="pg-val gold">${fmt(chain.yieldPool)} SOL</div><div class="pg-lbl">Current Yield Pool</div></div>
+        <div class="pg-item"><div class="pg-val b">${fmt(chain.donPot)} SOL</div><div class="pg-lbl">Bounty Pot</div></div>
+      </div>
+      <div class="pos-profits">
+        <div class="pp-title">Your Estimated Profits at Break</div>
+        <div class="pp-row"><span class="pp-k">Floor (spread profit)</span><span class="pp-v g">+${fmt(pos.profit||0)} SOL</span></div>
+        ${!pos.isLast?`
+        <div class="pp-row"><span class="pp-k">Community Break (+ yield share)</span><span class="pp-v b">+${fmt((pos.profit||0)+estYieldShare)} SOL</span></div>
+        <div class="pp-row"><span class="pp-k">Manual Break (+ bounty share)</span><span class="pp-v gold">+${fmt((pos.profit||0)+(chain.donPot*myStakeShare))} SOL</span></div>
+        `:`
+        <div class="pp-row"><span class="pp-k">If YOU break manually</span><span class="pp-v gold">${fmt(chain.yieldPool)} SOL (entire yield pool)</span></div>
+        <div class="pp-row"><span class="pp-k">If community breaks</span><span class="pp-v b">${fmt(chain.donPot)} SOL (donation pot paid to you)</span></div>
+        `}
+      </div>
+      <div class="pos-actions">
+        <button class="btn btn-ghost btn-sm" onclick="selectChain(${chain.id});showPage('protocol')">View Chain</button>
+        <button class="btn btn-ghost btn-sm" onclick="openDonate(${chain.id})" ${!walletConnected?'disabled':''}>Donate to Bounty</button>
+        ${pos.isLast&&timerExpired(chain)?`<button class="btn btn-red btn-sm" onclick="openBreak(${chain.id})">Break the Chain</button>`:''}
+        ${pos.isLast&&!timerExpired(chain)?`<button class="btn btn-ghost btn-sm" disabled>Break in ${fmtTimer(timerRemaining(chain))}</button>`:''}
+      </div>`;
+    list.appendChild(card);
+  });
+}
+
+/* ── MODALS ── */
+function openEnter(chainId){
+  const chain=CHAINS[chainId];
+  const ns=nextStake(chain),er=entryRequired(chain),fee=ns*FEE,np=nextProfit(chain);
+  document.getElementById('mTitle').textContent=`Enter ${chain.label} Chain`;
+  document.getElementById('mBody').innerHTML=`
+    <div class="m-note"><strong>Payouts only happen when the chain breaks.</strong> Your estimated profit is ${chain.spread}% of your stake. Nothing is confirmed until someone enters after you.</div>
+    <div class="m-rows">
+      <div class="m-row"><span class="m-k">Entry Price</span><span class="m-v g">${fmt(er)} SOL</span></div>
+      <div class="m-row"><span class="m-k">Your stake (excl. fee)</span><span class="m-v">${fmt(ns)} SOL</span></div>
+      <div class="m-row"><span class="m-k">Protocol fee (non-refundable)</span><span class="m-v gold">${fmt(fee)} SOL</span></div>
+      <div class="m-row"><span class="m-k">Est. Profit Floor</span><span class="m-v g">+${fmt(np)} SOL (${chain.spread}%)</span></div>
+    </div>`;
+  document.getElementById('mFoot').innerHTML=`
+    <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-g" onclick="doEnter(${chainId})">Enter — ${fmt(er)} SOL</button>`;
+  openModal();
+}
+
+function openDonate(chainId){
+  const chain=CHAINS[chainId];
+  const lastS=chain.stakers[chain.stakers.length-1];
+  const target=lastS?lastS.staked:0.01;
+  const rem=Math.max(0,target-chain.donPot);
+  const pct=donPct(chain);
+  document.getElementById('mTitle').textContent=`Donate to Bounty — ${chain.label}`;
+  document.getElementById('mBody').innerHTML=`
+    <div class="m-note">Once the pot reaches the target the chain auto-breaks. Community splits the yield pool. Last holder gets the donation pot.</div>
+    <div class="m-rows" style="margin-bottom:14px">
+      <div class="m-row"><span class="m-k">Current bounty pot</span><span class="m-v b">${fmt(chain.donPot)} SOL</span></div>
+      <div class="m-row"><span class="m-k">Target (last holder's stake)</span><span class="m-v">${fmt(target)} SOL</span></div>
+      <div class="m-row"><span class="m-k">Remaining to auto-break</span><span class="m-v r">${fmt(rem)} SOL</span></div>
+    </div>
+    <div class="don-bar-track" style="margin-bottom:16px"><div class="don-bar-fill" style="width:${pct}%"></div></div>
+    <div class="m-field">
+      <label>Amount to donate (SOL)</label>
+      <div class="m-input-wrap"><input class="m-input" type="number" id="dAmt" placeholder="0.0000" step="0.0001" min="0.0001"><span class="m-suffix">SOL</span></div>
+    </div>`;
+  document.getElementById('mFoot').innerHTML=`
+    <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-g" onclick="submitDonate(${chainId})">Donate</button>`;
+  openModal();
+}
+
+function openBreak(chainId){
+  const chain=CHAINS[chainId];
+  document.getElementById('mTitle').textContent=`Break the Chain — ${chain.label}`;
+  document.getElementById('mBody').innerHTML=`
+    <div class="m-note red"><strong>Irreversible.</strong> You collect the entire yield pool. The bounty pot splits proportionally to earlier stakers.</div>
+    <div class="m-rows">
+      <div class="m-row"><span class="m-k">You collect (yield pool)</span><span class="m-v g">${fmt(chain.yieldPool)} SOL</span></div>
+      <div class="m-row"><span class="m-k">Bounty pot splits to earlier stakers</span><span class="m-v b">${fmt(chain.donPot)} SOL</span></div>
+    </div>`;
+  document.getElementById('mFoot').innerHTML=`
+    <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-red" onclick="doBreak(${chainId})">Break the Chain</button>`;
+  openModal();
+}
+
+function openModal(){ document.getElementById('overlay').classList.add('open'); }
+function closeModal(){ document.getElementById('overlay').classList.remove('open'); }
+function overlayClick(e){ if(e.target===document.getElementById('overlay')) closeModal(); }
+
+/* ── ACTIONS ── */
+function doEnter(chainId){
+  if(!walletConnected){ toast('Connect wallet first','err'); return; }
+  const chain=CHAINS[chainId];
+  const ns=nextStake(chain),er=entryRequired(chain),np=nextProfit(chain);
+  chain.stakers.forEach(s=>s.last=false);
+  chain.stakers.push({addr:ME,staked:ns,profit:np,last:true,me:true,enteredAt:Date.now()});
+  chain.totalStaked+=ns;
+  chain.status=chain.stakers.length>=5?'hot':'active';
+  myPositions.forEach(p=>{if(p.chainId===chainId) p.isLast=false;});
+  myPositions.push({chainId,staked:ns,profit:np,isLast:true,posId:`p${Date.now()}`,enteredAt:Date.now()});
+  closeModal(); renderChainPage(); buildChainDropdown();
+  toast(`Entered ${chain.label} chain — paid ${fmt(er)} SOL`,'ok');
+}
+
+function submitDonate(chainId){
+  const input=document.getElementById('dAmt');
+  const amt=input?parseFloat(input.value):0;
+  if(!amt||amt<=0){ toast('Enter a valid amount','err'); return; }
+  if(!walletConnected){ toast('Connect wallet first','err'); return; }
+  const chain=CHAINS[chainId];
+  const lastS=chain.stakers[chain.stakers.length-1];
+  const target=lastS?lastS.staked:0.01;
+  chain.donPot=parseFloat((chain.donPot+amt).toFixed(8));
+  const forced=chain.donPot>=target-0.000001;
+  const yield_amt=chain.yieldPool;
+  const pot_amt=chain.donPot;
+  closeModal();
+  if(forced){
+    chain.stakers=[];chain.yieldPool=0;chain.donPot=0;chain.status='empty';chain.totalStaked=0;
+    myPositions=myPositions.filter(p=>p.chainId!==chainId);
+    renderChainPage(); renderProfile(); buildChainDropdown();
+    toast(`${chain.label} chain auto-broke! Community splits ${fmt(yield_amt)} SOL yield pool. Last holder got ${fmt(pot_amt)} SOL pot.`,'ok');
+  } else {
+    renderChainPage(); renderProfile();
+    toast(`Donated ${fmt(amt)} SOL to ${chain.label} bounty pot`,'ok');
+  }
+}
+
+function doBreak(chainId){
+  if(!timerExpired(CHAINS[chainId])){ toast('Timer not expired yet','err'); return; }
+  const chain=CHAINS[chainId];
+  const y=chain.yieldPool;
+  chain.stakers=[];chain.yieldPool=0;chain.donPot=0;chain.status='empty';chain.totalStaked=0;
+  myPositions=myPositions.filter(p=>p.chainId!==chainId);
+  closeModal(); renderChainPage(); renderProfile(); buildChainDropdown();
+  toast(`Chain broken! You collected ${fmt(y)} SOL yield pool 🎉`,'ok');
+}
+
+function toast(msg,type='ok'){
+  const c=document.getElementById('toasts');
+  const t=document.createElement('div');
+  t.className=`toast ${type}`;
+  t.innerHTML=`<span>${type==='ok'?'✓':'✕'}</span> <span>${msg}</span>`;
+  c.appendChild(t);
+  setTimeout(()=>t.remove(),4500);
+}
+
+let yv=12.84;
+setInterval(()=>{yv+=Math.random()*.003;const el=document.getElementById('ls-yield');if(el)el.textContent=yv.toFixed(4);},3000);
+</script>
+
+</body>
+</html>
